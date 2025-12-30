@@ -52,6 +52,7 @@ class RedisUploader(BaseUploader):
     ):
         if REDIS_JUST_INDEX:
             return
+        pipe = cls.client.pipeline()
         for i in range(len(ids)):
             idx = ids[i]
             vector_key = str(idx)
@@ -78,7 +79,7 @@ class RedisUploader(BaseUploader):
                     for k, v in meta.items()
                     if isinstance(v, dict)
                 }
-            cls.client.hset(
+            pipe.hset(
                 vector_key,
                 mapping={
                     "vector": np.array(vec).astype(cls.np_data_type).tobytes(),
@@ -86,6 +87,7 @@ class RedisUploader(BaseUploader):
                     **geopoints,
                 },
             )
+        pipe.execute()
                 
 
     @classmethod

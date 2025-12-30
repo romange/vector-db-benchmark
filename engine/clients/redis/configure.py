@@ -53,7 +53,8 @@ class RedisConfigurator(BaseConfigurator):
         for conn in conns:
             index = conn.ft()
             try:
-                index.dropindex(delete_documents=(not REDIS_KEEP_DOCUMENTS))
+                # index.dropindex(delete_documents=(not REDIS_KEEP_DOCUMENTS))
+                pass
             except redis.ResponseError as e:
                 str_err = e.__str__()
                 if (
