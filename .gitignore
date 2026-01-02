@@ -9,3 +9,7 @@ tools/custom/data.json
 
 *.png
 venv/
+
+# Dataset files
+datasets/*
+!datasets/datasets.json
