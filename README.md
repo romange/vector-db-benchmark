@@ -1,6 +1,6 @@
 # vector-db-benchmark
 
-A comprehensive benchmarking tool for vector databases, including Redis (both RediSearch and Vector Sets), Weaviate, Milvus, Qdrant, OpenSearch, Postgres, and others...
+A benchmarking tool for Redis vector databases, supporting both RediSearch and Redis Vector Sets.
 
 In a one-liner cli tool you can get this and much more:
 
@@ -45,14 +45,13 @@ QPS vs Precision Trade-off - vectorsets-fp32-default - glove-100-angular (up and
 
 > [View results](https://redis.io/blog/benchmarking-results-for-vector-databases/)
 
-There are various vector search engines available, and each of them may offer
-a different set of features and efficiency. But how do we measure the
-performance? There is no clear definition and in a specific case you
-may worry about a specific thing, while not paying much attention to other aspects. This
-project is a general framework for benchmarking different engines under the
-same hardware constraints, so you can choose what works best for you.
+There are various vector search engines available, and each may offer
+a different set of features and efficiency. This project provides
+a benchmarking framework specifically for Redis vector databases under
+controlled hardware constraints, so you can evaluate Redis performance
+for your use case.
 
-Running any benchmark requires choosing an engine, a dataset and defining the
+Running any benchmark requires choosing a Redis engine configuration, a dataset and defining the
 scenario against which it should be tested. A specific scenario may assume
 running the server in a single or distributed mode, a different client
 implementation and the number of client instances.
@@ -192,17 +191,17 @@ We have a number of precomputed data sets. All data sets have been pre-split int
 
 ## How to run a benchmark?
 
-Benchmarks are implemented in server-client mode, meaning that the server is
+Benchmarks are implemented in server-client mode, meaning that the Redis server is
 running in a single machine, and the client is running on another.
 
 ### Run the server
 
-All engines are served using docker compose. The configuration is in the [servers](./engine/servers/).
+Redis server is served using docker compose. The configuration is in the [servers](./engine/servers/).
 
 To launch the server instance, run the following command:
 
 ```bash
-cd ./engine/servers/<engine-configuration-name>
+cd ./engine/servers/redis-single-node
 docker compose up
 ```
 
@@ -259,13 +258,13 @@ python run.py --engines "qdrant-m-*" --datasets random-100
 ```
 
 ### 2. Custom Configuration File
-Use the `--engines-file` flag to specify a JSON file containing custom engine configurations:
+Use the `--engines-file` flag to specify a JSON file containing custom Redis engine configurations:
 
 ```bash
 python run.py --engines-file my_engines.json --datasets glove-25-angular
 ```
 
-The JSON file should contain an array of engine configuration objects. Each configuration must have a `name` field and follow the same structure as configurations in `experiments/configurations/`:
+The JSON file should contain an array of Redis engine configuration objects. Each configuration must have a `name` field and follow the same structure as configurations in `experiments/configurations/`:
 
 ```json
 [
@@ -304,26 +303,26 @@ The JSON file should contain an array of engine configuration objects. Each conf
 
 ## How to update benchmark parameters?
 
-Each engine has a configuration file, which is used to define the parameters for the benchmark.
+Each Redis engine configuration has a configuration file, which is used to define the parameters for the benchmark.
 Configuration files are located in the [configuration](./experiments/configurations/) directory.
 
 Each step in the benchmark process is using a dedicated configuration's path:
 
-* `connection_params` - passed to the client during the connection phase.
+* `connection_params` - passed to the Redis client during the connection phase.
 * `collection_params` - parameters, used to create the collection, indexing parameters are usually defined here.
 * `upload_params` - parameters, used to upload the data to the server.
 * `search_params` - passed to the client during the search phase. Framework allows multiple search configurations for the same experiment run.
 
-Exact values of the parameters are individual for each engine.
+Exact values of the parameters are specific to Redis configuration.
 
 ## How to register a dataset?
 
 Datasets are configured in the [datasets/datasets.json](./datasets/datasets.json) file.
 Framework will automatically download the dataset and store it in the [datasets](./datasets/) directory.
 
-## How to implement a new engine?
+## How to implement a new Redis configuration?
 
-There are a few base classes that you can use to implement a new engine.
+There are a few base classes that you can use to implement a new Redis configuration.
 
 * `BaseConfigurator` - defines methods to create collections, setup indexing parameters.
 * `BaseUploader` - defines methods to upload the data to the server.
